@@ -23,6 +23,8 @@ def _letters_digits(code):
 
 
 def _query(code):
+    if "-" in code and re.fullmatch(r"[A-Za-z]{2,4}\d{2}-\d{3}", code):
+        return f"one piece {code}"
     letters, digits = _letters_digits(code)
     return f"one piece ({code},{letters}-{digits}) (box,display)"
 
@@ -42,7 +44,7 @@ def ebay_token():
     cid = os.environ.get("EBAY_CLIENT_ID", "").strip()
     sec = os.environ.get("EBAY_CLIENT_SECRET", "").strip()
     if not cid or not sec:
-        return None, None
+        return None, "eBay API: EBAY_CLIENT_ID/EBAY_CLIENT_SECRET di produzione mancanti"
     try:
         auth = base64.b64encode(f"{cid}:{sec}".encode()).decode()
         r = requests.post(
@@ -62,16 +64,16 @@ def _api_headers(token, cfg):
     return {
         "Authorization": f"Bearer {token}",
         "X-EBAY-C-MARKETPLACE-ID": "EBAY_IT",
-        "X-EBAY-C-ENDUSERCTX": f"contextualLocation=country={c['paese']},zip={c['cap']}",
+        "X-EBAY-C-ENDUSERCTX": f"contextualLocation=country%3D{c['paese']}%2Czip%3D{c['cap']}",
     }
 
 
 def ebay_api_search(token, code, price_min, price_max, cfg):
     filt = (
-        "buyingOptions:{FIXED_PRICE},conditionIds:{1000},"
-        f"price:[{int(price_min)}..{int(price_max)}],priceCurrency:EUR,deliveryCountry:{cfg['consegna']['paese']}"
+        "buyingOptions:{FIXED_PRICE},"
+        f"deliveryCountry:{cfg['consegna']['paese']}"
     )
-    params = {"q": _query(code), "limit": "50", "sort": "price", "filter": filt}
+    params = {"q": _query(code), "limit": "200", "filter": filt}
     out = []
     try:
         r = requests.get(f"{EBAY_API}/buy/browse/v1/item_summary/search", params=params,
@@ -94,7 +96,7 @@ def ebay_api_search(token, code, price_min, price_max, cfg):
                 url=(it.get("itemWebUrl") or "").split("?")[0], source="ebay", seller=sel.get("username", ""),
                 seller_pct=float(pct) if pct not in (None, "") else None,
                 seller_n=int(n) if n not in (None, "") else None,
-                item_id=it.get("itemId"), condition_new=True,
+                item_id=it.get("itemId"), condition_new=str(it.get("conditionId")) == "1000",
             ))
     except Exception as e:
         return out, f"eBay API (ricerca {code}): {e}"
@@ -141,7 +143,10 @@ def _parse_ebay_html(html):
         a = it.select_one("a.s-item__link, a.s-card__link, a[href*='/itm/']")
         if not (t and p and a):
             continue
-        price = parse_eur(p.get_text(" "))
+        price_text = p.get_text(" ")
+        if not re.search(r"EUR|€", price_text, re.I) or re.search(r"\b(?:to|a)\b", price_text):
+            continue
+        price = parse_eur(price_text)
         if price is None:
             continue
         out.append({"title": t.get_text(" ", strip=True), "price": price,
@@ -154,6 +159,7 @@ def ebay_html_search(code):
            + "&LH_BIN=1&LH_ItemCondition=1000&_sop=15&_ipg=60")
     try:
         r = requests.get(url, headers=HEADERS, timeout=30)
+        r.raise_for_status()
         rows = _parse_ebay_html(r.text)
     except Exception as e:
         return [], f"eBay pagine ({code}): {e}"
@@ -163,19 +169,12 @@ def ebay_html_search(code):
 
 
 def ebay_sold_html(code):
-    """Venduti effettivi (prezzo articolo, senza spedizione). Ritorna [(titolo, prezzo)]."""
-    url = ("https://www.ebay.it/sch/i.html?_nkw=" + quote_plus(_query(code))
-           + "&LH_Sold=1&LH_Complete=1&LH_ItemCondition=1000&_sop=13&_ipg=60")
-    try:
-        r = requests.get(url, headers=HEADERS, timeout=30)
-        return [(x["title"], x["price"]) for x in _parse_ebay_html(r.text)], None
-    except Exception as e:
-        return [], f"eBay venduti ({code}): {e}"
+    """Le pagine pubbliche non certificano i prezzi delle proposte accettate."""
+    return [], "eBay venduti: prezzi di transazione non disponibili tramite Browse API"
 
 
 # ---------------------------------------------------------------- Vinted / negozi (non ufficiali)
 def vinted_search(code, cfg):
-    fee_pct, fee_fix = cfg["vinted"]["fee_pct"], cfg["vinted"]["fee_fissa_eur"]
     out = []
     try:
         s = requests.Session()
@@ -184,9 +183,12 @@ def vinted_search(code, cfg):
         r = s.get("https://www.vinted.it/api/v2/catalog/items",
                   params={"search_text": f"one piece {code} box", "order": "price_low_to_high", "per_page": 20},
                   timeout=30)
+        r.raise_for_status()
         for it in r.json().get("items", []):
+            if (it.get("price") or {}).get("currency_code") != "EUR":
+                continue
             price = float(it["price"]["amount"])
-            out.append(item(title=it["title"], item_eur=price, fees_eur=round(fee_fix + price * fee_pct / 100, 2),
+            out.append(item(title=it["title"], item_eur=price, fees_eur=None,
                             url=it["url"], source="vinted", seller=(it.get("user") or {}).get("login", "")))
     except Exception as e:
         return out, f"Vinted ({code}): {e}"
@@ -194,6 +196,7 @@ def vinted_search(code, cfg):
 
 
 _tp_cache = {}
+_currency_cache = {}
 
 
 def trustpilot(domain):
@@ -215,18 +218,28 @@ def shop_search(shop, code, use_trustpilot):
     """Negozi Shopify (endpoint pubblico di ricerca)."""
     out = []
     try:
+        domain = shop["domain"]
+        if domain not in _currency_cache:
+            currency_r = requests.get(f"https://{domain}/cart.js", headers=HEADERS, timeout=30)
+            currency_r.raise_for_status()
+            _currency_cache[domain] = currency_r.json().get("currency")
+        if _currency_cache[domain] != "EUR":
+            return [], f"Negozio {shop['name']}: valuta EUR non verificata, prezzi esclusi"
         r = requests.get(
             f"https://{shop['domain']}/search/suggest.json",
             params={"q": f"one piece {code} booster box", "resources[type]": "product", "resources[limit]": 5},
             headers=HEADERS, timeout=30,
         )
+        r.raise_for_status()
         trust = trustpilot(shop["domain"]) if use_trustpilot else None
         for p in r.json()["resources"]["results"]["products"]:
             price = float(p.get("price", 0) or 0)
             if price:
                 out.append(item(title=p["title"], item_eur=price, ship_eur=shop.get("spedizione_eur"),
                                 url=f"https://{shop['domain']}{p['url']}", source="shop",
-                                seller=shop["name"], trust=trust, condition_new=True))
+                                seller=shop["name"], trust=trust, condition_new=True,
+                                in_stock=p.get("available") if isinstance(p.get("available"), bool) else None))
     except Exception as e:
-        return out, f"Negozio {shop['name']} ({code}): {e}"
+        _currency_cache[shop["domain"]] = None
+        return out, f"Negozio {shop['name']}: fonte non disponibile, prezzi esclusi"
     return out, None
