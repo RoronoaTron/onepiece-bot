@@ -4,11 +4,11 @@
   "ora_riepilogo": 9,
   "lingua": "EN",
   "fonti": {
-    "ebay_api": true,
+    "ebay_api": false,
     "ebay_html": true,
     "ebay_venduti_html": false,
-    "negozi": true,
-    "trustpilot": true,
+    "negozi": false,
+    "trustpilot": false,
     "vinted": false
   },
   "verifica": {
