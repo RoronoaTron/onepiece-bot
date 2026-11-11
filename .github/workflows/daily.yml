@@ -1,11 +1,22 @@
-name: Offerte box giornaliere
+name: Monitor prezzi
 on:
   schedule:
-    - cron: "0 7 * * *"
+    - cron: "5 * * * *"
   workflow_dispatch:
+    inputs:
+      force_daily:
+        description: "Invia subito il riepilogo giornaliero"
+        type: boolean
+        default: false
+permissions:
+  contents: write
+concurrency:
+  group: monitor
+  cancel-in-progress: false
 jobs:
-  deals:
+  monitor:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     defaults:
       run:
         working-directory: onepiece-bot
@@ -19,3 +30,7 @@ jobs:
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          EBAY_CLIENT_ID: ${{ secrets.EBAY_CLIENT_ID }}
+          EBAY_CLIENT_SECRET: ${{ secrets.EBAY_CLIENT_SECRET }}
+          FORCE_DAILY: ${{ github.event.inputs.force_daily }}
+      - run: bash save_state.sh
