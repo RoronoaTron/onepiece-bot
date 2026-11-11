@@ -70,6 +70,10 @@ def scan_set(code, name, ref_e, prev_market, token, now, errors, last):
         its, err = sources.ebay_api_search(token, code, pmin, pmax, CFG)
         items += its
         err and errors.append(err)
+        if err and CFG["fonti"]["ebay_html"]:
+            fallback, fallback_error = sources.ebay_html_search(code)
+            items += fallback
+            fallback_error and errors.append(fallback_error)
     elif CFG["fonti"]["ebay_html"]:
         its, err = sources.ebay_html_search(code)
         items += its
@@ -87,20 +91,18 @@ def scan_set(code, name, ref_e, prev_market, token, now, errors, last):
             err and errors.append(err)
             time.sleep(PAUSE)
 
+    if token:
+        cands = [i for i in items if i["source"] == "ebay" and i.get("item_id")
+                 and engine.title_ok(i["title"], engine.set_regex(code))]
+        cands.sort(key=lambda i: i["item_eur"])
+        for candidate in cands[: CFG["verifica"]["max_candidati_verifica"]]:
+            candidate.update(sources.ebay_api_details(token, candidate["item_id"], CFG))
     offers = engine.evaluate(items, code, thr, market, CFG)
 
-    # verifica approfondita (disponibilità + lingua dichiarata) solo dei candidati eBay migliori
-    if token:
-        by_url = {i["url"]: i for i in items}
-        cands = [o for o in offers if o["cls"] in (engine.AFFARE, engine.CONV) and o["source"] == "ebay" and o["item_id"]]
-        for o in cands[: CFG["verifica"]["max_candidati_verifica"]]:
-            by_url[o["url"]].update(sources.ebay_api_details(token, o["item_id"], CFG))
-        if cands:
-            offers = engine.evaluate(items, code, thr, market, CFG)
-
-    if offers:
-        record(last, now, code, "ask_min_total", offers[0]["total_eur"], len(offers), "monitor")
-    return {"name": name, "market": market, "thresholds": thr, "n_offerte": len(offers), "offers": offers[:5]}
+    complete = [o for o in offers if o.get("total_complete")]
+    if complete:
+        record(last, now, code, "ask_min_total", complete[0]["total_eur"], len(complete), "monitor")
+    return {"name": name, "market": market, "thresholds": thr, "n_offerte": len(offers), "n_candidati": len(items), "offers": offers[:5]}
 
 
 def check_alerts(latest, now):
@@ -113,8 +115,8 @@ def check_alerts(latest, now):
         if not s or not s["offers"]:
             continue
         best = s["offers"][0]
-        if best["total_eur"] <= a["target_eur"]:
-            head = f"🔔 <b>ALERT {esc(a['code'])}</b>: scesso a {fmt_eur(best['total_eur'])} (soglia {fmt_eur(a['target_eur'])})"
+        if best.get("total_complete") and "ENG" in best.get("checks", []) and not best.get("warnings") and best["total_eur"] <= a["target_eur"]:
+            head = f"🔔 <b>ALERT {esc(a['code'])}</b>: sceso a {fmt_eur(best['total_eur'])} (soglia {fmt_eur(a['target_eur'])})"
             broadcast([head + "\n" + engine.fmt_offer(best, a["code"], s["name"], s["market"])])
             astate[a["id"]] = {"fired": now.isoformat(timespec="minutes"), "price_eur": best["total_eur"]}
             changed = True
@@ -125,6 +127,9 @@ def check_alerts(latest, now):
 def daily_summary(latest, now):
     blocks = [f"📦 <b>One Piece TCG ENG – riepilogo del {now:%d/%m/%Y}</b>"]
     good = engine.offer_blocks(latest)
+    if not good:
+        good = [engine.fmt_offer(s["offers"][0], code, s["name"], s["market"])
+                for code, s in latest["sets"].items() if s["offers"]][:8]
     if good:
         blocks += good
     else:
@@ -142,6 +147,8 @@ def main():
     tz = ZoneInfo(CFG["timezone"])
     now = dt.datetime.now(tz)
     ref = storage.load("reference.json", {"sets": []})
+    if not ref.get("sets"):
+        raise RuntimeError("Database espansioni assente o vuoto: controllare ONEPIECE_DATA_DIR/reference.json")
     prev = storage.load("latest.json", {"sets": {}})
     last = load_last_history()
     errors, notes = [], []
@@ -159,6 +166,8 @@ def main():
         latest["sets"][code] = scan_set(code, e["name"], e, (prev["sets"].get(code) or {}).get("market"),
                                         token, now, errors, last)
     latest["errors"] = list(dict.fromkeys(errors))
+    notes.append("Cardmarket: solo link, nessuna quotazione live autorizzata. Vinted: " + ("attivo (totale e commissioni da verificare)." if CFG["fonti"]["vinted"] else "disattivato; nessun prezzo acquisito."))
+    notes.append("Prezzi richiesti EUR; non equivalgono a vendite concluse. Riferimenti e soglie del database sono stime non verificate.")
     latest["notes"] = notes
     storage.save("latest.json", latest)
 
