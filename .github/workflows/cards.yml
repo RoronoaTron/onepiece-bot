@@ -9,6 +9,9 @@ concurrency:
 jobs:
   poll:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: onepiece-bot
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
