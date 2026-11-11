@@ -3,6 +3,51 @@ on:
   schedule:
     - cron: "*/5 * * * *"
   workflow_dispatch:
+    inputs:
+      verify_commands:
+        description: "Verifica Telegram e invia test dei comandi alle chat configurate"
+        type: boolean
+        default: false
+permissions:
+  contents: write
+concurrency:
+  group: onepiece-state
+  cancel-in-progress: false
+jobs:
+  poll:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    defaults:
+      run:
+        working-directory: onepiece-bot
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - run: python poll_cards.py
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          EBAY_CLIENT_ID: ${{ secrets.EBAY_CLIENT_ID }}
+          EBAY_CLIENT_SECRET: ${{ secrets.EBAY_CLIENT_SECRET }}
+      - name: Verifica reale Telegram e ricerca carta
+        if: ${{ github.event.inputs.verify_commands == 'true' }}
+        run: python verify_bot.py
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          EBAY_CLIENT_ID: ${{ secrets.EBAY_CLIENT_ID }}
+          EBAY_CLIENT_SECRET: ${{ secrets.EBAY_CLIENT_SECRET }}
+      - name: Salva stato anche dopo errori di invio
+        if: ${{ always() }}
+        run: bash save_state.sh
+name: Risposte comandi
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
 permissions:
   contents: write
 concurrency:
