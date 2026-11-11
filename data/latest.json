@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-11T11:18+01:00",
+ "updated": "2026-11-11T11:31+01:00",
  "sets": {
   "OP01": {
    "name": "Romance Dawn",
@@ -15,6 +15,7 @@
     "max": 1050
    },
    "n_offerte": 0,
+   "n_candidati": 5,
    "offers": []
   },
   "OP02": {
@@ -31,6 +32,7 @@
     "max": 295
    },
    "n_offerte": 0,
+   "n_candidati": 5,
    "offers": []
   },
   "OP03": {
@@ -47,6 +49,7 @@
     "max": 330
    },
    "n_offerte": 0,
+   "n_candidati": 5,
    "offers": []
   },
   "OP04": {
@@ -63,6 +66,7 @@
     "max": 240
    },
    "n_offerte": 0,
+   "n_candidati": 5,
    "offers": []
   },
   "OP05": {
@@ -79,6 +83,7 @@
     "max": 620
    },
    "n_offerte": 0,
+   "n_candidati": 5,
    "offers": []
   },
   "OP06": {
@@ -95,6 +100,7 @@
     "max": 230
    },
    "n_offerte": 0,
+   "n_candidati": 5,
    "offers": []
   },
   "EB01": {
@@ -111,6 +117,7 @@
     "max": 450
    },
    "n_offerte": 0,
+   "n_candidati": 5,
    "offers": []
   },
   "OP07": {
@@ -127,6 +134,7 @@
     "max": 195
    },
    "n_offerte": 0,
+   "n_candidati": 5,
    "offers": []
   },
   "OP08": {
@@ -143,6 +151,7 @@
     "max": 165
    },
    "n_offerte": 0,
+   "n_candidati": 5,
    "offers": []
   },
   "PRB01": {
@@ -159,6 +168,7 @@
     "max": 295
    },
    "n_offerte": 0,
+   "n_candidati": 5,
    "offers": []
   },
   "OP09": {
@@ -175,6 +185,7 @@
     "max": 310
    },
    "n_offerte": 0,
+   "n_candidati": 5,
    "offers": []
   },
   "OP10": {
@@ -191,6 +202,7 @@
     "max": 150
    },
    "n_offerte": 0,
+   "n_candidati": 5,
    "offers": []
   },
   "EB02": {
@@ -207,6 +219,7 @@
     "max": 375
    },
    "n_offerte": 0,
+   "n_candidati": 5,
    "offers": []
   },
   "OP11": {
@@ -223,6 +236,7 @@
     "max": 185
    },
    "n_offerte": 0,
+   "n_candidati": 5,
    "offers": []
   },
   "OP12": {
@@ -239,6 +253,7 @@
     "max": 180
    },
    "n_offerte": 0,
+   "n_candidati": 5,
    "offers": []
   },
   "PRB02": {
@@ -255,6 +270,7 @@
     "max": 165
    },
    "n_offerte": 0,
+   "n_candidati": 5,
    "offers": []
   },
   "OP13": {
@@ -271,6 +287,7 @@
     "max": 270
    },
    "n_offerte": 0,
+   "n_candidati": 5,
    "offers": []
   },
   "OP14": {
@@ -287,6 +304,7 @@
     "max": 140
    },
    "n_offerte": 0,
+   "n_candidati": 5,
    "offers": []
   },
   "EB03": {
@@ -303,6 +321,7 @@
     "max": 220
    },
    "n_offerte": 0,
+   "n_candidati": 5,
    "offers": []
   },
   "OP15": {
@@ -319,6 +338,7 @@
     "max": 160
    },
    "n_offerte": 0,
+   "n_candidati": 5,
    "offers": []
   },
   "OP16": {
@@ -335,6 +355,7 @@
     "max": 140
    },
    "n_offerte": 0,
+   "n_candidati": 5,
    "offers": []
   },
   "EB05": {
@@ -351,6 +372,7 @@
     "max": 185
    },
    "n_offerte": 0,
+   "n_candidati": 5,
    "offers": []
   },
   "OP17": {
@@ -367,58 +389,41 @@
     "max": 200
    },
    "n_offerte": 0,
+   "n_candidati": 5,
    "offers": []
   }
  },
  "errors": [
-  "eBay pagine (OP01): nessun risultato leggibile",
-  "Negozio Samurai Sword Tokyo (OP01): Expecting value: line 1 column 1 (char 0)",
-  "eBay pagine (OP02): nessun risultato leggibile",
-  "Negozio Samurai Sword Tokyo (OP02): Expecting value: line 1 column 1 (char 0)",
-  "eBay pagine (OP03): nessun risultato leggibile",
-  "Negozio Samurai Sword Tokyo (OP03): Expecting value: line 1 column 1 (char 0)",
-  "eBay pagine (OP04): nessun risultato leggibile",
-  "Negozio Samurai Sword Tokyo (OP04): Expecting value: line 1 column 1 (char 0)",
-  "eBay pagine (OP05): nessun risultato leggibile",
-  "Negozio Samurai Sword Tokyo (OP05): Expecting value: line 1 column 1 (char 0)",
-  "eBay pagine (OP06): nessun risultato leggibile",
-  "Negozio Samurai Sword Tokyo (OP06): Expecting value: line 1 column 1 (char 0)",
-  "eBay pagine (EB01): nessun risultato leggibile",
-  "Negozio Samurai Sword Tokyo (EB01): Expecting value: line 1 column 1 (char 0)",
-  "eBay pagine (OP07): nessun risultato leggibile",
-  "Negozio Samurai Sword Tokyo (OP07): Expecting value: line 1 column 1 (char 0)",
-  "eBay pagine (OP08): nessun risultato leggibile",
-  "Negozio Samurai Sword Tokyo (OP08): Expecting value: line 1 column 1 (char 0)",
-  "eBay pagine (PRB01): nessun risultato leggibile",
-  "Negozio Samurai Sword Tokyo (PRB01): Expecting value: line 1 column 1 (char 0)",
-  "eBay pagine (OP09): nessun risultato leggibile",
-  "Negozio Samurai Sword Tokyo (OP09): Expecting value: line 1 column 1 (char 0)",
-  "eBay pagine (OP10): nessun risultato leggibile",
-  "Negozio Samurai Sword Tokyo (OP10): Expecting value: line 1 column 1 (char 0)",
-  "eBay pagine (EB02): nessun risultato leggibile",
-  "Negozio Samurai Sword Tokyo (EB02): Expecting value: line 1 column 1 (char 0)",
-  "eBay pagine (OP11): nessun risultato leggibile",
-  "Negozio Samurai Sword Tokyo (OP11): Expecting value: line 1 column 1 (char 0)",
-  "eBay pagine (OP12): nessun risultato leggibile",
-  "Negozio Samurai Sword Tokyo (OP12): Expecting value: line 1 column 1 (char 0)",
-  "eBay pagine (PRB02): nessun risultato leggibile",
-  "Negozio Samurai Sword Tokyo (PRB02): Expecting value: line 1 column 1 (char 0)",
-  "eBay pagine (OP13): nessun risultato leggibile",
-  "Negozio Samurai Sword Tokyo (OP13): Expecting value: line 1 column 1 (char 0)",
-  "eBay pagine (OP14): nessun risultato leggibile",
-  "Negozio Samurai Sword Tokyo (OP14): Expecting value: line 1 column 1 (char 0)",
-  "eBay pagine (EB03): nessun risultato leggibile",
-  "Negozio Samurai Sword Tokyo (EB03): Expecting value: line 1 column 1 (char 0)",
-  "eBay pagine (OP15): nessun risultato leggibile",
-  "Negozio Samurai Sword Tokyo (OP15): Expecting value: line 1 column 1 (char 0)",
-  "eBay pagine (OP16): nessun risultato leggibile",
-  "Negozio Samurai Sword Tokyo (OP16): Expecting value: line 1 column 1 (char 0)",
-  "eBay pagine (EB05): nessun risultato leggibile",
-  "Negozio Samurai Sword Tokyo (EB05): Expecting value: line 1 column 1 (char 0)",
-  "eBay pagine (OP17): nessun risultato leggibile",
-  "Negozio Samurai Sword Tokyo (OP17): Expecting value: line 1 column 1 (char 0)"
+  "eBay API: EBAY_CLIENT_ID/EBAY_CLIENT_SECRET di produzione mancanti",
+  "eBay pagine (OP01): 403 Client Error: Forbidden for url: https://www.ebay.it/sch/i.html?_nkw=one+piece+%28OP01%2COP-01%29+%28box%2Cdisplay%29&LH_BIN=1&LH_ItemCondition=1000&_sop=15&_ipg=60",
+  "Negozio Samurai Sword Tokyo: fonte non disponibile, prezzi esclusi",
+  "eBay pagine (OP02): 403 Client Error: Forbidden for url: https://www.ebay.it/sch/i.html?_nkw=one+piece+%28OP02%2COP-02%29+%28box%2Cdisplay%29&LH_BIN=1&LH_ItemCondition=1000&_sop=15&_ipg=60",
+  "Negozio Samurai Sword Tokyo: valuta EUR non verificata, prezzi esclusi",
+  "eBay pagine (OP03): 403 Client Error: Forbidden for url: https://www.ebay.it/sch/i.html?_nkw=one+piece+%28OP03%2COP-03%29+%28box%2Cdisplay%29&LH_BIN=1&LH_ItemCondition=1000&_sop=15&_ipg=60",
+  "eBay pagine (OP04): 403 Client Error: Forbidden for url: https://www.ebay.it/sch/i.html?_nkw=one+piece+%28OP04%2COP-04%29+%28box%2Cdisplay%29&LH_BIN=1&LH_ItemCondition=1000&_sop=15&_ipg=60",
+  "eBay pagine (OP05): 403 Client Error: Forbidden for url: https://www.ebay.it/sch/i.html?_nkw=one+piece+%28OP05%2COP-05%29+%28box%2Cdisplay%29&LH_BIN=1&LH_ItemCondition=1000&_sop=15&_ipg=60",
+  "eBay pagine (OP06): 403 Client Error: Forbidden for url: https://www.ebay.it/sch/i.html?_nkw=one+piece+%28OP06%2COP-06%29+%28box%2Cdisplay%29&LH_BIN=1&LH_ItemCondition=1000&_sop=15&_ipg=60",
+  "eBay pagine (EB01): 403 Client Error: Forbidden for url: https://www.ebay.it/sch/i.html?_nkw=one+piece+%28EB01%2CEB-01%29+%28box%2Cdisplay%29&LH_BIN=1&LH_ItemCondition=1000&_sop=15&_ipg=60",
+  "eBay pagine (OP07): 403 Client Error: Forbidden for url: https://www.ebay.it/sch/i.html?_nkw=one+piece+%28OP07%2COP-07%29+%28box%2Cdisplay%29&LH_BIN=1&LH_ItemCondition=1000&_sop=15&_ipg=60",
+  "eBay pagine (OP08): 403 Client Error: Forbidden for url: https://www.ebay.it/sch/i.html?_nkw=one+piece+%28OP08%2COP-08%29+%28box%2Cdisplay%29&LH_BIN=1&LH_ItemCondition=1000&_sop=15&_ipg=60",
+  "eBay pagine (PRB01): 403 Client Error: Forbidden for url: https://www.ebay.it/sch/i.html?_nkw=one+piece+%28PRB01%2CPRB-01%29+%28box%2Cdisplay%29&LH_BIN=1&LH_ItemCondition=1000&_sop=15&_ipg=60",
+  "eBay pagine (OP09): 403 Client Error: Forbidden for url: https://www.ebay.it/sch/i.html?_nkw=one+piece+%28OP09%2COP-09%29+%28box%2Cdisplay%29&LH_BIN=1&LH_ItemCondition=1000&_sop=15&_ipg=60",
+  "eBay pagine (OP10): 403 Client Error: Forbidden for url: https://www.ebay.it/sch/i.html?_nkw=one+piece+%28OP10%2COP-10%29+%28box%2Cdisplay%29&LH_BIN=1&LH_ItemCondition=1000&_sop=15&_ipg=60",
+  "eBay pagine (EB02): 403 Client Error: Forbidden for url: https://www.ebay.it/sch/i.html?_nkw=one+piece+%28EB02%2CEB-02%29+%28box%2Cdisplay%29&LH_BIN=1&LH_ItemCondition=1000&_sop=15&_ipg=60",
+  "eBay pagine (OP11): 403 Client Error: Forbidden for url: https://www.ebay.it/sch/i.html?_nkw=one+piece+%28OP11%2COP-11%29+%28box%2Cdisplay%29&LH_BIN=1&LH_ItemCondition=1000&_sop=15&_ipg=60",
+  "eBay pagine (OP12): 403 Client Error: Forbidden for url: https://www.ebay.it/sch/i.html?_nkw=one+piece+%28OP12%2COP-12%29+%28box%2Cdisplay%29&LH_BIN=1&LH_ItemCondition=1000&_sop=15&_ipg=60",
+  "eBay pagine (PRB02): 403 Client Error: Forbidden for url: https://www.ebay.it/sch/i.html?_nkw=one+piece+%28PRB02%2CPRB-02%29+%28box%2Cdisplay%29&LH_BIN=1&LH_ItemCondition=1000&_sop=15&_ipg=60",
+  "eBay pagine (OP13): 403 Client Error: Forbidden for url: https://www.ebay.it/sch/i.html?_nkw=one+piece+%28OP13%2COP-13%29+%28box%2Cdisplay%29&LH_BIN=1&LH_ItemCondition=1000&_sop=15&_ipg=60",
+  "eBay pagine (OP14): 403 Client Error: Forbidden for url: https://www.ebay.it/sch/i.html?_nkw=one+piece+%28OP14%2COP-14%29+%28box%2Cdisplay%29&LH_BIN=1&LH_ItemCondition=1000&_sop=15&_ipg=60",
+  "eBay pagine (EB03): 403 Client Error: Forbidden for url: https://www.ebay.it/sch/i.html?_nkw=one+piece+%28EB03%2CEB-03%29+%28box%2Cdisplay%29&LH_BIN=1&LH_ItemCondition=1000&_sop=15&_ipg=60",
+  "eBay pagine (OP15): 403 Client Error: Forbidden for url: https://www.ebay.it/sch/i.html?_nkw=one+piece+%28OP15%2COP-15%29+%28box%2Cdisplay%29&LH_BIN=1&LH_ItemCondition=1000&_sop=15&_ipg=60",
+  "eBay pagine (OP16): 403 Client Error: Forbidden for url: https://www.ebay.it/sch/i.html?_nkw=one+piece+%28OP16%2COP-16%29+%28box%2Cdisplay%29&LH_BIN=1&LH_ItemCondition=1000&_sop=15&_ipg=60",
+  "eBay pagine (EB05): 403 Client Error: Forbidden for url: https://www.ebay.it/sch/i.html?_nkw=one+piece+%28EB05%2CEB-05%29+%28box%2Cdisplay%29&LH_BIN=1&LH_ItemCondition=1000&_sop=15&_ipg=60",
+  "eBay pagine (OP17): 403 Client Error: Forbidden for url: https://www.ebay.it/sch/i.html?_nkw=one+piece+%28OP17%2COP-17%29+%28box%2Cdisplay%29&LH_BIN=1&LH_ItemCondition=1000&_sop=15&_ipg=60"
  ],
  "notes": [
-  "eBay API non configurata: leggo le pagine di eBay (venditore e disponibilità non verificabili, quindi niente 🔥 AFFARE da quella fonte)."
+  "eBay API non configurata: leggo le pagine di eBay (venditore e disponibilità non verificabili, quindi niente 🔥 AFFARE da quella fonte).",
+  "Cardmarket: solo link, nessuna quotazione live autorizzata. Vinted: disattivato; nessun prezzo acquisito.",
+  "Prezzi richiesti EUR; non equivalgono a vendite concluse. Riferimenti e soglie del database sono stime non verificate."
  ]
 }
