@@ -155,8 +155,8 @@ def _parse_ebay_html(html):
 
 
 def ebay_html_search(code):
-    url = ("https://www.ebay.it/sch/i.html?_nkw=" + quote_plus(_query(code))
-           + "&LH_BIN=1&LH_ItemCondition=1000&_sop=15&_ipg=60")
+    url = ("https://www.ebay.it/sch/i.html?_nkw=" + quote_plus((f"one piece {code}" if re.fullmatch(r"[A-Z]+\d{2}-\d{3}", code, re.I) else _query(code) + " (eng,english,inglese) (sealed,sigillato,sigillata)"))
+           + "&LH_BIN=1&_sop=12&_ipg=60")
     try:
         r = requests.get(url, headers=HEADERS, timeout=30)
         r.raise_for_status()
@@ -164,13 +164,13 @@ def ebay_html_search(code):
     except Exception as e:
         return [], f"eBay pagine ({code}): {e}"
     items = [item(title=x["title"], item_eur=x["price"], ship_eur=x["ship"], url=x["url"], source="ebay",
-                  condition_new=True) for x in rows]
+                  condition_new=False) for x in rows]
     return items, (None if items else f"eBay pagine ({code}): nessun risultato leggibile")
 
 
 def ebay_sold_html(code):
     """Le pagine pubbliche non certificano i prezzi delle proposte accettate."""
-    return [], "eBay venduti: prezzi di transazione non disponibili tramite Browse API"
+    return [], "eBay venduti: prezzi effettivi di transazione non verificabili dalle pagine pubbliche"
 
 
 # ---------------------------------------------------------------- Vinted / negozi (non ufficiali)
