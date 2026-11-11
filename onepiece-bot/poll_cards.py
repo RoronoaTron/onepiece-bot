@@ -8,7 +8,7 @@ import requests
 
 import engine
 import storage
-from cards import build_reply, extract_code, cardmarket_link
+from cards import build_reply, extract_code
 from common import CHAT_IDS, TOKEN, esc, fmt_eur, send, send_long, telegram_request
 
 API = f"https://api.telegram.org/bot{TOKEN}"
@@ -109,7 +109,6 @@ def h_box(args, ctx):
         out += [engine.fmt_offer(o, code, s["name"], m) for o in s["offers"][:3]]
     else:
         out.append("Nessuna inserzione valida trovata.")
-    out.append(f'<a href="{esc(cardmarket_link(code))}">Confronta su Cardmarket</a> · prezzo live non acquisito')
     out.append(_updated(latest))
     return out
 
