@@ -11,7 +11,7 @@ on:
 permissions:
   contents: write
 concurrency:
-  group: monitor
+  group: onepiece-state
   cancel-in-progress: false
 jobs:
   monitor:
@@ -33,4 +33,6 @@ jobs:
           EBAY_CLIENT_ID: ${{ secrets.EBAY_CLIENT_ID }}
           EBAY_CLIENT_SECRET: ${{ secrets.EBAY_CLIENT_SECRET }}
           FORCE_DAILY: ${{ github.event.inputs.force_daily }}
-      - run: bash save_state.sh
+      - name: Salva stato anche dopo errori di invio
+        if: ${{ always() }}
+        run: bash save_state.sh
