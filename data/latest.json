@@ -1,0 +1,424 @@
+{
+ "updated": "2026-11-11T11:18+01:00",
+ "sets": {
+  "OP01": {
+   "name": "Romance Dawn",
+   "market": {
+    "value": 1150,
+    "source": "ref_json",
+    "n": 0,
+    "date": null,
+    "verified": false
+   },
+   "thresholds": {
+    "excellent": 950,
+    "max": 1050
+   },
+   "n_offerte": 0,
+   "offers": []
+  },
+  "OP02": {
+   "name": "Paramount War",
+   "market": {
+    "value": 320,
+    "source": "ref_json",
+    "n": 0,
+    "date": null,
+    "verified": false
+   },
+   "thresholds": {
+    "excellent": 270,
+    "max": 295
+   },
+   "n_offerte": 0,
+   "offers": []
+  },
+  "OP03": {
+   "name": "Pillars of Strength",
+   "market": {
+    "value": 361,
+    "source": "ref_json",
+    "n": 0,
+    "date": null,
+    "verified": false
+   },
+   "thresholds": {
+    "excellent": 300,
+    "max": 330
+   },
+   "n_offerte": 0,
+   "offers": []
+  },
+  "OP04": {
+   "name": "Kingdoms of Intrigue",
+   "market": {
+    "value": 260,
+    "source": "ref_json",
+    "n": 0,
+    "date": null,
+    "verified": false
+   },
+   "thresholds": {
+    "excellent": 220,
+    "max": 240
+   },
+   "n_offerte": 0,
+   "offers": []
+  },
+  "OP05": {
+   "name": "Awakening of the New Era",
+   "market": {
+    "value": 680,
+    "source": "ref_json",
+    "n": 0,
+    "date": null,
+    "verified": false
+   },
+   "thresholds": {
+    "excellent": 570,
+    "max": 620
+   },
+   "n_offerte": 0,
+   "offers": []
+  },
+  "OP06": {
+   "name": "Wings of the Captain",
+   "market": {
+    "value": 250,
+    "source": "ref_json",
+    "n": 0,
+    "date": null,
+    "verified": false
+   },
+   "thresholds": {
+    "excellent": 210,
+    "max": 230
+   },
+   "n_offerte": 0,
+   "offers": []
+  },
+  "EB01": {
+   "name": "Memorial Collection",
+   "market": {
+    "value": 490,
+    "source": "ref_json",
+    "n": 0,
+    "date": null,
+    "verified": false
+   },
+   "thresholds": {
+    "excellent": 410,
+    "max": 450
+   },
+   "n_offerte": 0,
+   "offers": []
+  },
+  "OP07": {
+   "name": "500 Years in the Future",
+   "market": {
+    "value": 213,
+    "source": "ref_json",
+    "n": 0,
+    "date": null,
+    "verified": false
+   },
+   "thresholds": {
+    "excellent": 180,
+    "max": 195
+   },
+   "n_offerte": 0,
+   "offers": []
+  },
+  "OP08": {
+   "name": "Two Legends",
+   "market": {
+    "value": 178,
+    "source": "ref_json",
+    "n": 0,
+    "date": null,
+    "verified": false
+   },
+   "thresholds": {
+    "excellent": 150,
+    "max": 165
+   },
+   "n_offerte": 0,
+   "offers": []
+  },
+  "PRB01": {
+   "name": "The Best",
+   "market": {
+    "value": 320,
+    "source": "ref_json",
+    "n": 0,
+    "date": null,
+    "verified": false
+   },
+   "thresholds": {
+    "excellent": 270,
+    "max": 295
+   },
+   "n_offerte": 0,
+   "offers": []
+  },
+  "OP09": {
+   "name": "Emperors in the New World",
+   "market": {
+    "value": 339,
+    "source": "ref_json",
+    "n": 0,
+    "date": null,
+    "verified": false
+   },
+   "thresholds": {
+    "excellent": 285,
+    "max": 310
+   },
+   "n_offerte": 0,
+   "offers": []
+  },
+  "OP10": {
+   "name": "Royal Blood",
+   "market": {
+    "value": 165,
+    "source": "ref_json",
+    "n": 0,
+    "date": null,
+    "verified": false
+   },
+   "thresholds": {
+    "excellent": 140,
+    "max": 150
+   },
+   "n_offerte": 0,
+   "offers": []
+  },
+  "EB02": {
+   "name": "Anime 25th Collection",
+   "market": {
+    "value": 410,
+    "source": "ref_json",
+    "n": 0,
+    "date": null,
+    "verified": false
+   },
+   "thresholds": {
+    "excellent": 345,
+    "max": 375
+   },
+   "n_offerte": 0,
+   "offers": []
+  },
+  "OP11": {
+   "name": "A Fist of Divine Speed",
+   "market": {
+    "value": 200,
+    "source": "ref_json",
+    "n": 0,
+    "date": null,
+    "verified": false
+   },
+   "thresholds": {
+    "excellent": 170,
+    "max": 185
+   },
+   "n_offerte": 0,
+   "offers": []
+  },
+  "OP12": {
+   "name": "Legacy of the Master",
+   "market": {
+    "value": 194,
+    "source": "ref_json",
+    "n": 0,
+    "date": null,
+    "verified": false
+   },
+   "thresholds": {
+    "excellent": 165,
+    "max": 180
+   },
+   "n_offerte": 0,
+   "offers": []
+  },
+  "PRB02": {
+   "name": "The Best Vol. 2",
+   "market": {
+    "value": 179,
+    "source": "ref_json",
+    "n": 0,
+    "date": null,
+    "verified": false
+   },
+   "thresholds": {
+    "excellent": 150,
+    "max": 165
+   },
+   "n_offerte": 0,
+   "offers": []
+  },
+  "OP13": {
+   "name": "Carrying On His Will",
+   "market": {
+    "value": 295,
+    "source": "ref_json",
+    "n": 0,
+    "date": null,
+    "verified": false
+   },
+   "thresholds": {
+    "excellent": 250,
+    "max": 270
+   },
+   "n_offerte": 0,
+   "offers": []
+  },
+  "OP14": {
+   "name": "The Azure Seas Seven",
+   "market": {
+    "value": 155,
+    "source": "ref_json",
+    "n": 0,
+    "date": null,
+    "verified": false
+   },
+   "thresholds": {
+    "excellent": 130,
+    "max": 140
+   },
+   "n_offerte": 0,
+   "offers": []
+  },
+  "EB03": {
+   "name": "Heroines Edition",
+   "market": {
+    "value": 239,
+    "source": "ref_json",
+    "n": 0,
+    "date": null,
+    "verified": false
+   },
+   "thresholds": {
+    "excellent": 200,
+    "max": 220
+   },
+   "n_offerte": 0,
+   "offers": []
+  },
+  "OP15": {
+   "name": "Adventure on Kami’s Island",
+   "market": {
+    "value": 175,
+    "source": "ref_json",
+    "n": 0,
+    "date": null,
+    "verified": false
+   },
+   "thresholds": {
+    "excellent": 145,
+    "max": 160
+   },
+   "n_offerte": 0,
+   "offers": []
+  },
+  "OP16": {
+   "name": "The Time of Battle",
+   "market": {
+    "value": 155,
+    "source": "ref_json",
+    "n": 0,
+    "date": null,
+    "verified": false
+   },
+   "thresholds": {
+    "excellent": 130,
+    "max": 140
+   },
+   "n_offerte": 0,
+   "offers": []
+  },
+  "EB05": {
+   "name": "Heroines Edition Vol. 2",
+   "market": {
+    "value": 200,
+    "source": "ref_json",
+    "n": 0,
+    "date": null,
+    "verified": false
+   },
+   "thresholds": {
+    "excellent": 170,
+    "max": 185
+   },
+   "n_offerte": 0,
+   "offers": []
+  },
+  "OP17": {
+   "name": "The World’s Strongest Warriors",
+   "market": {
+    "value": 220,
+    "source": "ref_json",
+    "n": 0,
+    "date": null,
+    "verified": false
+   },
+   "thresholds": {
+    "excellent": 185,
+    "max": 200
+   },
+   "n_offerte": 0,
+   "offers": []
+  }
+ },
+ "errors": [
+  "eBay pagine (OP01): nessun risultato leggibile",
+  "Negozio Samurai Sword Tokyo (OP01): Expecting value: line 1 column 1 (char 0)",
+  "eBay pagine (OP02): nessun risultato leggibile",
+  "Negozio Samurai Sword Tokyo (OP02): Expecting value: line 1 column 1 (char 0)",
+  "eBay pagine (OP03): nessun risultato leggibile",
+  "Negozio Samurai Sword Tokyo (OP03): Expecting value: line 1 column 1 (char 0)",
+  "eBay pagine (OP04): nessun risultato leggibile",
+  "Negozio Samurai Sword Tokyo (OP04): Expecting value: line 1 column 1 (char 0)",
+  "eBay pagine (OP05): nessun risultato leggibile",
+  "Negozio Samurai Sword Tokyo (OP05): Expecting value: line 1 column 1 (char 0)",
+  "eBay pagine (OP06): nessun risultato leggibile",
+  "Negozio Samurai Sword Tokyo (OP06): Expecting value: line 1 column 1 (char 0)",
+  "eBay pagine (EB01): nessun risultato leggibile",
+  "Negozio Samurai Sword Tokyo (EB01): Expecting value: line 1 column 1 (char 0)",
+  "eBay pagine (OP07): nessun risultato leggibile",
+  "Negozio Samurai Sword Tokyo (OP07): Expecting value: line 1 column 1 (char 0)",
+  "eBay pagine (OP08): nessun risultato leggibile",
+  "Negozio Samurai Sword Tokyo (OP08): Expecting value: line 1 column 1 (char 0)",
+  "eBay pagine (PRB01): nessun risultato leggibile",
+  "Negozio Samurai Sword Tokyo (PRB01): Expecting value: line 1 column 1 (char 0)",
+  "eBay pagine (OP09): nessun risultato leggibile",
+  "Negozio Samurai Sword Tokyo (OP09): Expecting value: line 1 column 1 (char 0)",
+  "eBay pagine (OP10): nessun risultato leggibile",
+  "Negozio Samurai Sword Tokyo (OP10): Expecting value: line 1 column 1 (char 0)",
+  "eBay pagine (EB02): nessun risultato leggibile",
+  "Negozio Samurai Sword Tokyo (EB02): Expecting value: line 1 column 1 (char 0)",
+  "eBay pagine (OP11): nessun risultato leggibile",
+  "Negozio Samurai Sword Tokyo (OP11): Expecting value: line 1 column 1 (char 0)",
+  "eBay pagine (OP12): nessun risultato leggibile",
+  "Negozio Samurai Sword Tokyo (OP12): Expecting value: line 1 column 1 (char 0)",
+  "eBay pagine (PRB02): nessun risultato leggibile",
+  "Negozio Samurai Sword Tokyo (PRB02): Expecting value: line 1 column 1 (char 0)",
+  "eBay pagine (OP13): nessun risultato leggibile",
+  "Negozio Samurai Sword Tokyo (OP13): Expecting value: line 1 column 1 (char 0)",
+  "eBay pagine (OP14): nessun risultato leggibile",
+  "Negozio Samurai Sword Tokyo (OP14): Expecting value: line 1 column 1 (char 0)",
+  "eBay pagine (EB03): nessun risultato leggibile",
+  "Negozio Samurai Sword Tokyo (EB03): Expecting value: line 1 column 1 (char 0)",
+  "eBay pagine (OP15): nessun risultato leggibile",
+  "Negozio Samurai Sword Tokyo (OP15): Expecting value: line 1 column 1 (char 0)",
+  "eBay pagine (OP16): nessun risultato leggibile",
+  "Negozio Samurai Sword Tokyo (OP16): Expecting value: line 1 column 1 (char 0)",
+  "eBay pagine (EB05): nessun risultato leggibile",
+  "Negozio Samurai Sword Tokyo (EB05): Expecting value: line 1 column 1 (char 0)",
+  "eBay pagine (OP17): nessun risultato leggibile",
+  "Negozio Samurai Sword Tokyo (OP17): Expecting value: line 1 column 1 (char 0)"
+ ],
+ "notes": [
+  "eBay API non configurata: leggo le pagine di eBay (venditore e disponibilità non verificabili, quindi niente 🔥 AFFARE da quella fonte)."
+ ]
+}
