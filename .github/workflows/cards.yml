@@ -1,10 +1,12 @@
-name: Risposte codici carta
+name: Risposte comandi
 on:
   schedule:
     - cron: "*/5 * * * *"
   workflow_dispatch:
+permissions:
+  contents: write
 concurrency:
-  group: cards
+  group: poll
   cancel-in-progress: false
 jobs:
   poll:
@@ -22,3 +24,4 @@ jobs:
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      - run: bash save_state.sh
