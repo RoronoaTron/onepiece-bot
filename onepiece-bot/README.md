@@ -1,27 +1,24 @@
-# Bot Telegram One Piece TCG (costo 0)
+# One Piece TCG – tracker prezzi box ENG (Telegram, costo 0)
 
-- **Ogni giorno** ti manda le offerte dei box vicino al retail (negozi con voto Trustpilot, eBay, Vinted).
-- **Scrivi un codice carta** (es. `OP13-017`) e ricevi prezzo di mercato, ultimi venduti eBay.it e link Cardmarket.
+Gira su GitHub Actions (repository pubblico). Dati in `data/` (storico append-only `history.jsonl`).
 
-Gira interamente su GitHub Actions (gratis con repository pubblico).
+- **Monitor** (ogni ora): cerca offerte, aggiorna lo storico, controlla gli alert, dopo le 09:00 manda il riepilogo.
+- **Comandi** (controllo ogni ~5 min): /prezzi /offerte /box /storico /alert /carta /id /help.
 
-## Setup (circa 5 minuti, una sola volta)
+## Segreti GitHub (Settings → Secrets and variables → Actions)
+- `TELEGRAM_TOKEN`, `TELEGRAM_CHAT_ID` (es. `357230695,-100123...` utente e gruppo)
+- facoltativi ma consigliati: `EBAY_CLIENT_ID`, `EBAY_CLIENT_SECRET` (chiavi gratuite eBay Developer, API Browse).
+  Senza chiavi il bot legge le pagine eBay: non può verificare venditore e disponibilità, quindi nessun 🔥 AFFARE da eBay.
 
-1. **Token bot**: su Telegram apri @BotFather → `/newbot` → copia il token.
-2. **Chat ID**: scrivi un messaggio qualsiasi al tuo nuovo bot, poi apri nel browser
-   `https://api.telegram.org/bot<TOKEN>/getUpdates` e copia il numero in `"chat":{"id":...}`.
-3. **GitHub**: crea un repository **pubblico** e carica tutti questi file (cartella `.github` inclusa).
-4. Nel repo: *Settings → Secrets and variables → Actions → New repository secret*:
-   - `TELEGRAM_TOKEN` = il token
-   - `TELEGRAM_CHAT_ID` = il tuo chat id
-5. Scheda *Actions*: abilita i workflow e lancia a mano "Offerte box giornaliere" per provare.
+## Dati e soglie
+`data/reference.json` = database iniziale (non verificato in tempo reale, non viene mai modificato dal bot).
+Il bot aggiunge rilevazioni datate a `data/history.jsonl` senza sovrascrivere nulla. Il valore di mercato diventa
+"verificato" solo con ≥5 venduti eBay ENG recenti; in quel caso le soglie del JSON vengono scalate con gli stessi rapporti.
 
-## Personalizzazione
-`config.json`: box da monitorare, prezzo retail, tolleranza %, voto Trustpilot minimo, negozi
-(i negozi devono essere basati su Shopify per essere letti in automatico).
-
-## Limiti onesti
-- Risposta ai codici carta con ritardo fino a ~5-10 minuti (cron di GitHub). Per risposte istantanee serve un hosting sempre acceso.
-- **Cardmarket** non ha un'API gratuita aperta: il prezzo numerico arriva da TCGplayer (USD) tramite OPTCG API; per Cardmarket ricevi il link diretto.
-- **eBay venduti** e **Vinted** sono letti via scraping: possono smettere di funzionare se cambiano le pagine o bloccano le richieste. In quel caso ricevi comunque il link alla ricerca.
-- Il codice non è stato testato dal vivo (nessun accesso di rete dal mio ambiente): al primo avvio controlla i log in *Actions*.
+## Limiti
+- Cardmarket: nessuna API gratuita aperta → solo link e riferimento dal JSON.
+- eBay venduti, Vinted, negozi, Trustpilot: lettura pagine non ufficiale, può rompersi o non essere consentita
+  dai termini dei siti. Ogni fonte si spegne in `config.json` → `fonti`.
+- Le Actions programmate su repo pubblici vengono sospese dopo 60 giorni senza attività del repo
+  (qui i commit dei dati contano come attività).
+- Il repository è pubblico: tutto in `data/` (anche gli alert) è visibile a chiunque. Gli alert non contengono chat ID.

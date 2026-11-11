@@ -1,4 +1,4 @@
-"""Ricerca prezzo carta: OPTCG API (gratis) + ultimi venduti eBay.it + link Cardmarket."""
+"""Ricerca prezzo carta: OPTCG API (convertito in EUR) + ultimi venduti eBay.it + link Cardmarket."""
 import re
 import statistics
 from urllib.parse import quote_plus
@@ -6,13 +6,16 @@ from urllib.parse import quote_plus
 import requests
 from bs4 import BeautifulSoup
 
-from common import HEADERS, parse_eur
+from common import HEADERS, esc, parse_eur, usd_eur_rate
 
 CODE_RE = re.compile(r"^[A-Za-z]{2,4}\d{2}-\d{3}$")
 
 
-def is_card_code(text):
-    return bool(CODE_RE.match(text.strip()))
+def extract_code(text):
+    """Accetta 'OP13-017', '/carta OP13-017', '@bot OP13-017'. Altrimenti None."""
+    t = re.sub(r"^/(carta|c)(@\w+)?\s*", "", text.strip(), flags=re.I)
+    t = re.sub(r"@\w+", "", t).strip()
+    return t.upper() if CODE_RE.match(t) else None
 
 
 def cardmarket_link(code):
@@ -52,8 +55,7 @@ def ebay_sold(code, n=10):
     try:
         r = requests.get(url, headers=HEADERS, timeout=30)
         soup = BeautifulSoup(r.text, "html.parser")
-        items = soup.select("li.s-item, li.s-card")
-        for it in items:
+        for it in soup.select("li.s-item, li.s-card"):
             title_el = it.select_one(".s-item__title, .s-card__title")
             price_el = it.select_one(".s-item__price, .s-card__price")
             if not title_el or not price_el:
@@ -72,16 +74,24 @@ def ebay_sold(code, n=10):
 
 def build_reply(code):
     code = code.strip().upper()
-    lines = [f"<b>{code}</b>"]
+    lines = [f"<b>{esc(code)}</b>"]
+    rate = usd_eur_rate()
 
     cards = optcg_prices(code)
     if cards:
         for c in cards[:4]:
             m = c["market"]
-            lines.append(
-                f"• {c['name']} [{c['set_id']}] {c['rarity']}: "
-                + (f"${m} (mercato TCGplayer)" if m is not None else "prezzo n/d")
-            )
+            try:
+                usd = float(m)
+            except (TypeError, ValueError):
+                usd = None
+            if usd is None:
+                price_txt = "prezzo n/d"
+            elif rate:
+                price_txt = f"€{usd * rate:.2f} (mercato TCGplayer, ${usd:.2f})"
+            else:
+                price_txt = f"${usd:.2f} (mercato TCGplayer)"
+            lines.append(f"• {esc(c['name'])} [{esc(c['set_id'])}] {esc(c['rarity'])}: {price_txt}")
     else:
         lines.append("• Carta non trovata nel database prezzi (controlla il codice).")
 
@@ -94,7 +104,7 @@ def build_reply(code):
         )
     else:
         lines.append("\neBay: nessun venduto leggibile in automatico.")
-    lines.append(f'<a href="{ebay_url}">Venduti eBay</a>')
-    lines.append(f'<a href="{cardmarket_link(code)}">Cardmarket</a>')
+    lines.append(f'<a href="{esc(ebay_url)}">Venduti eBay</a>')
+    lines.append(f'<a href="{esc(cardmarket_link(code))}">Cardmarket</a> (nessuna API gratuita: apri il link per il prezzo aggiornato)')
     lines.append("\nNota: le versioni parallele/alt art hanno prezzi diversi, controlla le righe sopra.")
     return "\n".join(lines)

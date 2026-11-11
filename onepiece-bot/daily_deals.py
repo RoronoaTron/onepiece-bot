@@ -1,120 +1,176 @@
-"""Report giornaliero: box One Piece vicino al retail su negozi (con voto Trustpilot), eBay e Vinted."""
+"""Monitor prezzi (eseguito ogni ora da GitHub Actions).
+1. aggiorna il valore di mercato (venduti eBay, se verificabili) e cerca le offerte per ogni box ENG
+2. aggiunge rilevazioni datate allo storico (append-only)
+3. controlla gli alert  4. dopo le 09:00 invia il riepilogo giornaliero (una volta al giorno)
+"""
+import datetime as dt
 import json
-import re
-from urllib.parse import quote_plus
+import os
+import time
+from zoneinfo import ZoneInfo
 
-import requests
-from bs4 import BeautifulSoup
+import engine
+import sources
+import storage
+from common import broadcast, esc, fmt_eur
 
-from common import HEADERS, OWNER_CHAT_ID, parse_eur, send
-
-CFG = json.load(open("config.json", encoding="utf-8"))
-
-
-def trustpilot(domain):
-    try:
-        r = requests.get(f"https://it.trustpilot.com/review/{domain}", headers=HEADERS, timeout=30)
-        if r.status_code != 200:
-            return None
-        m = re.search(r'"ratingValue"\s*:\s*"?([0-9.]+)"?', r.text)
-        return float(m.group(1)) if m else None
-    except Exception:
-        return None
+CFG = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json"), encoding="utf-8"))
+PAUSE = float(os.environ.get("SCAN_PAUSE", "1.2"))
 
 
-def shop_offers(shop, query):
-    """Funziona con negozi Shopify (endpoint pubblico di ricerca)."""
-    out = []
-    try:
-        r = requests.get(
-            f"https://{shop['domain']}/search/suggest.json",
-            params={"q": query, "resources[type]": "product", "resources[limit]": 5},
-            headers=HEADERS, timeout=30,
-        )
-        prods = r.json()["resources"]["results"]["products"]
-        for p in prods:
-            price = float(p.get("price", 0) or 0)
-            if price:
-                out.append((p["title"], price, f"https://{shop['domain']}{p['url']}"))
-    except Exception:
-        pass
-    return out
+def load_last_history():
+    last = {}
+    for r in storage.history_read():
+        last[(r["set"], r["kind"])] = r
+    return last
 
 
-def ebay_offers(query):
-    url = "https://www.ebay.it/sch/i.html?_nkw=" + quote_plus(query + " sealed") + "&LH_BIN=1&_sop=15&_ipg=60"
-    out = []
-    try:
-        soup = BeautifulSoup(requests.get(url, headers=HEADERS, timeout=30).text, "html.parser")
-        for it in soup.select("li.s-item, li.s-card")[:20]:
-            t = it.select_one(".s-item__title, .s-card__title")
-            p = it.select_one(".s-item__price, .s-card__price")
-            a = it.select_one("a")
-            if t and p and a:
-                price = parse_eur(p.get_text(" "))
-                if price:
-                    out.append((t.get_text(" ", strip=True), price, a.get("href", "").split("?")[0]))
-    except Exception:
-        pass
-    return out, url
+def record(last, now, code, kind, price, n, source):
+    """Nuova rilevazione datata; salta i doppioni (stesso prezzo ±2% entro 6 ore)."""
+    prev = last.get((code, kind))
+    if prev:
+        age = (now - dt.datetime.fromisoformat(prev["ts"])).total_seconds()
+        if age < 6 * 3600 and abs(prev["price_eur"] - price) <= 0.02 * prev["price_eur"]:
+            return
+    rec = {"ts": now.isoformat(timespec="minutes"), "set": code, "kind": kind,
+           "price_eur": round(price, 2), "n": n, "source": source}
+    storage.history_append(rec)
+    last[(code, kind)] = rec
 
 
-def vinted_offers(query):
-    """Vinted non ha API pubblica: tentativo best-effort, può fallire."""
-    out = []
-    try:
-        s = requests.Session()
-        s.headers.update(HEADERS)
-        s.get("https://www.vinted.it", timeout=30)
-        r = s.get(
-            "https://www.vinted.it/api/v2/catalog/items",
-            params={"search_text": query, "order": "price_low_to_high", "per_page": 20},
-            timeout=30,
-        )
-        for it in r.json().get("items", []):
-            out.append((it["title"], float(it["price"]["amount"]), it["url"]))
-    except Exception:
-        pass
-    return out
+def update_market(code, ref_e, prev_market, now, errors, last):
+    base = {"value": ref_e["cardmarket_reference_min_eur"], "source": "ref_json", "n": 0, "date": None, "verified": False}
+    pm = prev_market or {}
+    fresh = None
+    if pm.get("source") == "sold_ebay" and pm.get("date"):
+        age = now - dt.datetime.fromisoformat(pm["date"])
+        if age < dt.timedelta(hours=20):
+            return pm                                       # già aggiornato oggi
+        if age < dt.timedelta(days=30):
+            fresh = pm                                      # fallback se la nuova lettura fallisce
+    if CFG["fonti"]["ebay_venduti_html"]:
+        sold, err = sources.ebay_sold_html(code)
+        time.sleep(PAUSE)
+        if err:
+            errors.append(err)
+        m = engine.market_from_sold(sold, code, base["value"], CFG, now.isoformat(timespec="minutes"))
+        if m:
+            record(last, now, code, "sold_median", m["value"], m["n"], "ebay_venduti_html")
+            return m
+    return fresh or base
+
+
+def scan_set(code, name, ref_e, prev_market, token, now, errors, last):
+    market = update_market(code, ref_e, prev_market, now, errors, last)
+    thr = engine.thresholds(ref_e, market)
+    pmin, pmax = market["value"] * CFG["verifica"]["prezzo_minimo_pct_mercato"] / 100, market["value"] * 1.6
+
+    items = []
+    if CFG["fonti"]["ebay_api"] and token:
+        its, err = sources.ebay_api_search(token, code, pmin, pmax, CFG)
+        items += its
+        err and errors.append(err)
+    elif CFG["fonti"]["ebay_html"]:
+        its, err = sources.ebay_html_search(code)
+        items += its
+        err and errors.append(err)
+    time.sleep(PAUSE)
+    if CFG["fonti"]["vinted"]:
+        its, err = sources.vinted_search(code, CFG)
+        items += its
+        err and errors.append(err)
+        time.sleep(PAUSE)
+    if CFG["fonti"]["negozi"]:
+        for shop in CFG.get("negozi", []):
+            its, err = sources.shop_search(shop, code, CFG["fonti"]["trustpilot"])
+            items += its
+            err and errors.append(err)
+            time.sleep(PAUSE)
+
+    offers = engine.evaluate(items, code, thr, market, CFG)
+
+    # verifica approfondita (disponibilità + lingua dichiarata) solo dei candidati eBay migliori
+    if token:
+        by_url = {i["url"]: i for i in items}
+        cands = [o for o in offers if o["cls"] in (engine.AFFARE, engine.CONV) and o["source"] == "ebay" and o["item_id"]]
+        for o in cands[: CFG["verifica"]["max_candidati_verifica"]]:
+            by_url[o["url"]].update(sources.ebay_api_details(token, o["item_id"], CFG))
+        if cands:
+            offers = engine.evaluate(items, code, thr, market, CFG)
+
+    if offers:
+        record(last, now, code, "ask_min_total", offers[0]["total_eur"], len(offers), "monitor")
+    return {"name": name, "market": market, "thresholds": thr, "n_offerte": len(offers), "offers": offers[:5]}
+
+
+def check_alerts(latest, now):
+    alerts, astate = storage.load("alerts.json", []), storage.load("alerts_state.json", {})
+    changed = False
+    for a in alerts:
+        if a["id"] in astate:
+            continue
+        s = latest["sets"].get(a["code"])
+        if not s or not s["offers"]:
+            continue
+        best = s["offers"][0]
+        if best["total_eur"] <= a["target_eur"]:
+            head = f"🔔 <b>ALERT {esc(a['code'])}</b>: scesso a {fmt_eur(best['total_eur'])} (soglia {fmt_eur(a['target_eur'])})"
+            broadcast([head + "\n" + engine.fmt_offer(best, a["code"], s["name"], s["market"])])
+            astate[a["id"]] = {"fired": now.isoformat(timespec="minutes"), "price_eur": best["total_eur"]}
+            changed = True
+    if changed:
+        storage.save("alerts_state.json", astate)
+
+
+def daily_summary(latest, now):
+    blocks = [f"📦 <b>One Piece TCG ENG – riepilogo del {now:%d/%m/%Y}</b>"]
+    good = engine.offer_blocks(latest)
+    if good:
+        blocks += good
+    else:
+        blocks.append("Nessun affare o offerta conveniente oggi.")
+    n_sets = len(latest["sets"])
+    n_with = sum(1 for s in latest["sets"].values() if s["offers"])
+    blocks.append(f"Set monitorati: {n_sets}, con almeno un'inserzione valida: {n_with}.")
+    blocks += [f"ℹ️ {esc(n)}" for n in latest.get("notes", [])]
+    if latest.get("errors"):
+        blocks.append("⚠️ Fonti con problemi: " + esc("; ".join(latest["errors"][:5])))
+    return blocks
 
 
 def main():
-    tol = CFG["tolleranza_pct"] / 100
-    blocks = []
-    for box in CFG["boxes"]:
-        limit = box["retail_eur"] * (1 + tol)
-        lines = [f"<b>{box['name']}</b> (retail €{box['retail_eur']}, max €{limit:.0f})"]
-        found = False
+    tz = ZoneInfo(CFG["timezone"])
+    now = dt.datetime.now(tz)
+    ref = storage.load("reference.json", {"sets": []})
+    prev = storage.load("latest.json", {"sets": {}})
+    last = load_last_history()
+    errors, notes = [], []
 
-        for shop in CFG["shops"]:
-            score = trustpilot(shop["domain"])
-            if score is not None and score < CFG["min_trustpilot"]:
-                continue
-            for title, price, url in shop_offers(shop, box["query"]):
-                if price <= limit and box["name"].split()[0].lower() in title.lower():
-                    stars = f"Trustpilot {score}" if score else "Trustpilot n/d"
-                    lines.append(f'🛒 {shop["name"]} €{price:.2f} ({stars}) <a href="{url}">link</a>')
-                    found = True
+    token, err = (sources.ebay_token() if CFG["fonti"]["ebay_api"] else (None, None))
+    if err:
+        errors.append(err)
+    if not token:
+        notes.append("eBay API non configurata: leggo le pagine di eBay (venditore e disponibilità non verificabili, "
+                     "quindi niente 🔥 AFFARE da quella fonte).")
 
-        eb, eb_url = ebay_offers(box["query"])
-        for title, price, url in eb:
-            if box["retail_eur"] * 0.7 <= price <= limit:
-                lines.append(f'🟦 eBay €{price:.2f} <a href="{url}">{title[:50]}</a>')
-                found = True
-                break
-        lines.append(f'<a href="{eb_url}">Tutti i risultati eBay</a>')
+    latest = {"updated": now.isoformat(timespec="minutes"), "sets": {}}
+    for e in ref["sets"]:
+        code = e["code"]
+        latest["sets"][code] = scan_set(code, e["name"], e, (prev["sets"].get(code) or {}).get("market"),
+                                        token, now, errors, last)
+    latest["errors"] = list(dict.fromkeys(errors))
+    latest["notes"] = notes
+    storage.save("latest.json", latest)
 
-        for title, price, url in vinted_offers(box["query"]):
-            if box["retail_eur"] * 0.7 <= price <= limit:
-                lines.append(f'🟩 Vinted €{price:.2f} <a href="{url}">{title[:50]}</a>')
-                found = True
-                break
+    check_alerts(latest, now)
 
-        if not found:
-            lines.append("Nessuna offerta sotto la soglia oggi.")
-        blocks.append("\n".join(lines))
-
-    send(OWNER_CHAT_ID, "📦 <b>Box One Piece TCG – offerte del giorno</b>\n\n" + "\n\n".join(blocks))
+    state = storage.load("state.json", {})
+    today = now.date().isoformat()
+    force = os.environ.get("FORCE_DAILY", "").lower() == "true"
+    if force or (now.hour >= CFG["ora_riepilogo"] and state.get("last_daily") != today):
+        broadcast(daily_summary(latest, now))
+        state["last_daily"] = today
+        storage.save("state.json", state)
 
 
 if __name__ == "__main__":
