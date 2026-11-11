@@ -8,8 +8,8 @@ import requests
 
 import engine
 import storage
-from cards import build_reply, extract_code
-from common import CHAT_IDS, TOKEN, esc, fmt_eur, send, send_long
+from cards import build_reply, extract_code, cardmarket_link
+from common import CHAT_IDS, TOKEN, esc, fmt_eur, send, send_long, telegram_request
 
 API = f"https://api.telegram.org/bot{TOKEN}"
 
@@ -45,14 +45,14 @@ def h_prezzi(args, ctx):
     latest = load_latest()
     if not latest:
         return NO_DATA
-    lines = ["<b>Valore di mercato box ENG</b>"]
+    lines = ["<b>Box ENG · prezzi richiesti e riferimenti</b>"]
     for code, s in latest["sets"].items():
         m = s["market"]
         mk = fmt_eur(m["value"], 0) + ("" if m["source"] == "sold_ebay" else "*")
         best = s["offers"][0] if s["offers"] else None
         b = f" · migliore {fmt_eur(best['total_eur'], 0)} {engine.ICON[best['cls']]}" if best else ""
         lines.append(f"{code}: {mk}{b}")
-    lines.append("\n* rif. Cardmarket (min) dal database, non verificato. Senza *: mediana venduti eBay.")
+    lines.append("\n* stima storica del database, non quotazione Cardmarket verificata. Senza *: mediana venduti eBay.")
     lines.append(_updated(latest))
     return ["\n".join(lines)]
 
@@ -62,7 +62,11 @@ def h_offerte(args, ctx):
     if not latest:
         return NO_DATA
     blocks = engine.offer_blocks(latest)
-    return blocks + [_updated(latest)] if blocks else ["Nessun affare o offerta conveniente al momento.\n" + _updated(latest)]
+    if not blocks:
+        blocks = ["Nessun affare verificato. Inserzioni con prezzi richiesti:"]
+        blocks += [engine.fmt_offer(s["offers"][0], code, s["name"], s["market"])
+                   for code, s in latest["sets"].items() if s["offers"]][:8]
+    return blocks + [_updated(latest)]
 
 
 def _series(code, kind):
@@ -105,6 +109,7 @@ def h_box(args, ctx):
         out += [engine.fmt_offer(o, code, s["name"], m) for o in s["offers"][:3]]
     else:
         out.append("Nessuna inserzione valida trovata.")
+    out.append(f'<a href="{esc(cardmarket_link(code))}">Confronta su Cardmarket</a> · prezzo live non acquisito')
     out.append(_updated(latest))
     return out
 
@@ -159,7 +164,7 @@ def h_alert(args, ctx):
     if len(alerts) >= 30:
         return ["Troppi alert attivi (max 30)."]
     alerts.append({"id": str(int(time.time() * 1000)), "code": code, "target_eur": price,
-                   "created": dt.datetime.utcnow().isoformat(timespec="minutes") + "Z"})
+                   "created": dt.datetime.now(dt.timezone.utc).isoformat(timespec="minutes")})
     storage.save("alerts.json", alerts)
     return [f"🔔 Alert impostato: {code} ≤ {fmt_eur(price)} (totale con spedizione). "
             "Avviso a tutto il gruppo; controllo a ogni giro del monitor (ogni ora)."]
@@ -177,7 +182,10 @@ COMMANDS = {"/prezzi": h_prezzi, "/offerte": h_offerte, "/box": h_box, "/storico
 
 
 def main():
-    r = requests.get(f"{API}/getUpdates", params={"timeout": 0}, timeout=30).json()
+    if not CHAT_IDS:
+        raise RuntimeError("TELEGRAM_CHAT_ID non configurato: nessuna chat autorizzata")
+    state = storage.load("poll_state.json", {})
+    r = telegram_request("getUpdates", {"timeout": 0, "offset": state.get("offset", 0)})
     updates = r.get("result", [])
     if not updates:
         return
@@ -210,9 +218,11 @@ def main():
                 if not is_group:
                     send(chat_id, "Non ho capito. /help per la lista dei comandi.", mid)
         except Exception as e:
-            print("Errore:", e)
+            print("Errore durante la risposta Telegram (dettagli riservati)")
+            raise RuntimeError("Risposta non inviata; update non confermato") from None
     last = max(u["update_id"] for u in updates)
-    requests.get(f"{API}/getUpdates", params={"offset": last + 1, "timeout": 0}, timeout=30)
+    storage.save("poll_state.json", {"offset": last + 1})
+    telegram_request("getUpdates", {"offset": last + 1, "timeout": 0})
 
 
 if __name__ == "__main__":
