@@ -45,31 +45,9 @@ def optcg_prices(code):
 
 
 def ebay_sold(code, n=10):
-    """Ultimi venduti su ebay.it (scraping best-effort della pagina 'venduti')."""
-    url = (
-        "https://www.ebay.it/sch/i.html?_nkw="
-        + quote_plus(f"{code} one piece")
-        + "&LH_Sold=1&LH_Complete=1&_sop=13&_ipg=60"
-    )
-    prices = []
-    try:
-        r = requests.get(url, headers=HEADERS, timeout=30)
-        soup = BeautifulSoup(r.text, "html.parser")
-        for it in soup.select("li.s-item, li.s-card"):
-            title_el = it.select_one(".s-item__title, .s-card__title")
-            price_el = it.select_one(".s-item__price, .s-card__price")
-            if not title_el or not price_el:
-                continue
-            if code.lower().replace("-", "") not in title_el.get_text().lower().replace("-", "").replace(" ", ""):
-                continue
-            p = parse_eur(price_el.get_text(" "))
-            if p:
-                prices.append(p)
-            if len(prices) >= n:
-                break
-    except Exception:
-        pass
-    return prices, url
+    """Link only: accepted prices and card variants cannot be verified here."""
+    url = "https://www.ebay.it/sch/i.html?_nkw=" + quote_plus(f"{code} one piece") + "&LH_Sold=1&LH_Complete=1&_sop=13"
+    return [], url
 
 
 def build_reply(code):
@@ -95,6 +73,24 @@ def build_reply(code):
     else:
         lines.append("• Carta non trovata nel database prezzi (controlla il codice).")
 
+    import json
+    import os
+    import sources
+    cfg = json.load(open(os.path.join(os.path.dirname(__file__), "config.json"), encoding="utf-8"))
+    token, err = sources.ebay_token()
+    if token:
+        offers, err = sources.ebay_api_search(token, code, 0, 0, cfg)
+        matching = [o for o in offers if re.search(re.escape(code).replace(r"\-", r"[ -]?"), o["title"], re.I)]
+        if matching:
+            lines.append("\n<b>eBay · prezzi richiesti (non venduti)</b>")
+            for o in matching[:3]:
+                shipping = f" + sped. €{o['ship_eur']:.2f}" if o["ship_eur"] is not None else " + spedizione n/d"
+                seller = f"{o['seller_pct']}% / {o['seller_n']} feedback" if o["seller_pct"] is not None else "affidabilità n/d"
+                lines.append(f'<a href="{esc(o["url"])}">{esc(o["title"][:100])}</a>: €{o["item_eur"]:.2f}{shipping} · {esc(seller)}')
+        else:
+            lines.append("eBay: nessuna inserzione EUR corrispondente." if not err else "eBay API: ricerca non disponibile.")
+    else:
+        lines.append("eBay API non disponibile: verificare le chiavi di produzione.")
     prices, ebay_url = ebay_sold(code)
     if prices:
         med = statistics.median(prices)
@@ -103,7 +99,7 @@ def build_reply(code):
             f"(min €{min(prices):.2f} – max €{max(prices):.2f})"
         )
     else:
-        lines.append("\neBay: nessun venduto leggibile in automatico.")
+        lines.append("\nVendite concluse: prezzo effettivo non verificabile automaticamente con gli accessi disponibili.")
     lines.append(f'<a href="{esc(ebay_url)}">Venduti eBay</a>')
     lines.append(f'<a href="{esc(cardmarket_link(code))}">Cardmarket</a> (nessuna API gratuita: apri il link per il prezzo aggiornato)')
     lines.append("\nNota: le versioni parallele/alt art hanno prezzi diversi, controlla le righe sopra.")
