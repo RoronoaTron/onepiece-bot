@@ -8,16 +8,16 @@ Il catalogo era nella data/ della radice, mentre il programma cercava in onepiec
 
 ## Secrets GitHub
 
-Configurare TELEGRAM_TOKEN e TELEGRAM_CHAT_ID (ID autorizzati separati da virgola: privato e/o gruppo). EBAY_CLIENT_ID e EBAY_CLIENT_SECRET devono essere chiavi Production eBay Developer abilitate a Browse. Il bot ottiene il token OAuth automaticamente; non serve il token personale del venditore. Non inserire credenziali nei file o in chat. Il CAP di consegna gia configurato e 00100: verificare la spedizione per la destinazione effettiva.
+Configurare TELEGRAM_TOKEN e TELEGRAM_CHAT_ID (ID autorizzati separati da virgola: privato e/o gruppo). Non servono chiavi eBay: la modalità attiva usa soltanto le pagine pubbliche eBay, senza API. Non inserire credenziali nei file o in chat. Il CAP di consegna gia configurato e 00100: verificare la spedizione per la destinazione effettiva.
 
 ## Prezzi e fonti
 
-- eBay Browse ufficiale: prezzi richiesti EUR, spedizione se disponibile, feedback e dettagli lingua/disponibilita. Se le chiavi mancano o la ricerca fallisce, fallback alle pagine pubbliche, senza certificare il venditore.
+- eBay: ricerca HTML pubblica per box sigillati ENG e singole carte, solo prezzi richiesti EUR. Le API sono disattivate. Gli errori HTTP e le pagine illeggibili vengono segnalati; non vengono aggirati blocchi.
 - Nessun prezzo richiesto viene presentato come vendita conclusa. Browse non restituisce i venduti; le pagine pubbliche non certificano il prezzo di una proposta accettata. Le mediane automatiche da tali pagine sono disabilitate.
-- Cardmarket: link per confronto manuale, nessuna quotazione live senza accesso autorizzato. I prezzi del database sono stime storiche non verificate, non prezzi retail o Cardmarket aggiornati.
+- Cardmarket: nessuna ricerca attiva. I riferimenti del database sono stime storiche non verificate, non prezzi aggiornati.
 - Vinted: integrazione opzionale conservata, disattivata di default. Se attivata, spedizione e commissioni non note restano da verificare. Nessun aggiramento di accessi o blocchi.
-- Negozi Shopify: prezzi inclusi solo con valuta EUR confermata; Trustpilot quando leggibile. Un punteggio sconosciuto non certifica affidabilita.
-- Carte: OPTCG/TCGplayer in USD, conversione EUR solo con cambio disponibile, fonte esplicita. eBay mostra annunci singoli senza mescolare base, alt art e grading in una mediana.
+- Negozi e Trustpilot: disattivati nella modalità solo eBay.
+- Carte: solo annunci eBay; nessuna chiamata OPTCG, TCGplayer o API di cambio. Varianti, lingua e feedback vanno verificati nella singola inserzione.
 
 Totali incompleti sono indicati come minimo noto. Gli alert richiedono totale completo, lingua ENG, nuovo, sigillo dichiarato, disponibilita e reputazione verificata. Il riepilogo mostra anche inserzioni con avvertenze, senza etichettarle come affari verificati.
 
