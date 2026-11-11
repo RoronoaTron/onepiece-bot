@@ -1,0 +1,13 @@
+{
+  "_nota": "retail_eur = prezzo di listino del box che vuoi (modificalo); tolleranza = % sopra il retail ancora accettata",
+  "boxes": [
+    {"name": "OP13 Carrying On His Will (EN)", "query": "one piece OP13 booster box english", "retail_eur": 110},
+    {"name": "OP12 (EN)", "query": "one piece OP12 booster box english", "retail_eur": 110}
+  ],
+  "tolleranza_pct": 15,
+  "min_trustpilot": 3.8,
+  "shops": [
+    {"name": "CardCosmos", "domain": "cardcosmos.de"},
+    {"name": "Samurai Sword Tokyo", "domain": "samuraiswordtokyo.com"}
+  ]
+}
