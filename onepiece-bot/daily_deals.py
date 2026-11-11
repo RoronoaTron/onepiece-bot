@@ -157,7 +157,7 @@ def main():
     if err:
         errors.append(err)
     if not token:
-        notes.append("eBay API non configurata: leggo le pagine di eBay (venditore e disponibilità non verificabili, "
+        notes.append("Modalità eBay senza API: leggo solo le pagine pubbliche (venditore e disponibilità non verificabili, "
                      "quindi niente 🔥 AFFARE da quella fonte).")
 
     latest = {"updated": now.isoformat(timespec="minutes"), "sets": {}}
