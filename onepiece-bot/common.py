@@ -3,7 +3,7 @@ import os
 import re
 import requests
 
-TOKEN = os.environ["TELEGRAM_TOKEN"]
+TOKEN = os.environ.get("TELEGRAM_TOKEN", "").strip()
 # Uno o più chat ID separati da virgola (tu + gruppo). Es: 357230695,-1001234567890
 CHAT_IDS = [c.strip() for c in os.environ.get("TELEGRAM_CHAT_ID", "").split(",") if c.strip()]
 
@@ -36,8 +36,23 @@ def send(chat_id, text, reply_to=None):
     }
     if reply_to:
         payload["reply_parameters"] = {"message_id": reply_to, "allow_sending_without_reply": True}
-    r = requests.post(f"https://api.telegram.org/bot{TOKEN}/sendMessage", json=payload, timeout=30)
-    r.raise_for_status()
+    telegram_request("sendMessage", payload, method="post")
+
+
+def telegram_request(endpoint, payload, method="get"):
+    if not TOKEN:
+        raise RuntimeError("TELEGRAM_TOKEN non configurato")
+    try:
+        url = f"https://api.telegram.org/bot{TOKEN}/{endpoint}"
+        r = requests.post(url, json=payload, timeout=30) if method == "post" else requests.get(url, params=payload, timeout=30)
+        if r.status_code != 200:
+            raise RuntimeError(f"Telegram {endpoint}: HTTP {r.status_code}")
+        data = r.json()
+        if not data.get("ok"):
+            raise RuntimeError(f"Telegram {endpoint}: API non riuscita")
+        return data
+    except requests.RequestException:
+        raise RuntimeError(f"Telegram {endpoint}: errore di rete") from None
 
 
 def send_long(chat_id, blocks, sep="\n\n", limit=3800, reply_to=None):
@@ -54,11 +69,17 @@ def send_long(chat_id, blocks, sep="\n\n", limit=3800, reply_to=None):
 
 def broadcast(blocks):
     """Invia a tutte le chat configurate (tu + gruppo); un errore su una chat non ferma le altre."""
+    if not CHAT_IDS:
+        raise RuntimeError("TELEGRAM_CHAT_ID non configurato")
+    failures = 0
     for cid in CHAT_IDS:
         try:
             send_long(cid, blocks)
         except Exception as e:
-            print(f"Invio fallito verso {cid}: {e}")
+            failures += 1
+            print("Invio Telegram fallito (dettagli riservati)")
+    if failures:
+        raise RuntimeError(f"Invio fallito a {failures} chat; stato non confermato")
 
 
 def parse_eur(text):
