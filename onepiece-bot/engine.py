@@ -10,22 +10,22 @@ LABEL = {AFFARE: "AFFARE", CONV: "CONVENIENTE", NORMALE: "NORMALE", NO_SOGLIA: "
 
 BAD_WORDS = [
     "bustina", "booster pack", "singol", "empty", "vuot", "damaged", "danneggiat", "ripack", "resealed",
-    "aperto", "opened", "playmat", "sleeve", "proxy", "custom", "lotto", "psa", "bgs", "replica",
+    "illustration", "double pack", "fresh box", "blister", "starter", "deck", "tin", "gift", "custodia", "vetrina", "acril", "acryl", "protector", "protezion", "storage", "topper", "aperto", "opened", "playmat", "sleeve", "proxy", "custom", "lotto", "case", "carton", "psa", "bgs", "replica",
 ]
-BAD_LANG = ["jap", "giapp", "jpn", "chinese", "cinese", "korean", "coreano", "thai", "simplified", "french", "francese"]
+BAD_LANG = ["jap", "giapp", "jpn", "chinese", "cinese", "korean", "coreano", "thai", "simplified", "french", "francese", "german", "tedesco", "spanish", "spagnolo", "portuguese"]
 EN_RE = re.compile(r"\b(eng|english|inglese)\b", re.I)
 
 
 def set_regex(code):
     m = re.match(r"([A-Za-z]+)(\d+)$", code)
-    return re.compile(rf"\b{m.group(1).lower()}[\s\-]?0?{int(m.group(2))}\b", re.I)
+    return re.compile(rf"\b{m.group(1).lower()}[\s\-]?0?{int(m.group(2))}\b(?![- ]\d{{3}}\b)", re.I)
 
 
 def title_ok(title, set_re, lang="EN"):
     tl = title.lower()
     if not set_re.search(tl) or not re.search(r"box|display|scatola", tl):
         return False
-    if any(w in tl for w in BAD_WORDS):
+    if any(w in tl for w in BAD_WORDS) or re.search(r"\b(?:[2-9]|1[0-9])\s*(?:x\s*)?(?:box|display)\b|\b(?:box|display)\s*[x×]\s*\d", tl):
         return False
     if lang == "EN" and any(w in tl for w in BAD_LANG):
         return False
@@ -37,7 +37,7 @@ def market_label(m):
     if m.get("source") == "sold_ebay":
         d = (m.get("date") or "")[:10]
         return f"mediana venduti eBay, n={m.get('n')}, {d[8:10]}/{d[5:7]}"
-    return "rif. Cardmarket min dal database, non verificato"
+    return "stima storica del database, non verificata su Cardmarket"
 
 
 def thresholds(ref_e, market):
@@ -75,11 +75,13 @@ def evaluate(items, code, thr, market, cfg):
         seen.add(it["url"])
         if it["item_eur"] is None or not title_ok(it["title"], set_re, lang):
             continue
-        if it["item_eur"] < floor:                       # troppo basso: sospetto
+        if it["item_eur"] <= 0:
             continue
         if it.get("in_stock") is False:                  # non disponibile
             continue
         l = it.get("language")
+        if lang == "EN" and not EN_RE.search(it["title"]) and not (l and re.search(r"ingl|english|\beng?\b", l, re.I)):
+            continue
         if l and lang == "EN" and not re.search(r"ingl|english|\beng?\b", l, re.I):
             continue
         if it["source"] == "ebay":
@@ -95,6 +97,8 @@ def evaluate(items, code, thr, market, cfg):
             checks.append("ENG")
         else:
             warnings.append("lingua non esplicita")
+        if it["item_eur"] < floor:
+            warnings.append("prezzo molto basso: verificare prodotto e sigillo")
         if it.get("condition_new"):
             checks.append("nuovo")
         else:
@@ -103,6 +107,8 @@ def evaluate(items, code, thr, market, cfg):
             checks.append("disponibile")
         else:
             warnings.append("disponibilità non verificata")
+        if not re.search(r"sealed|sigillat|factory seal|\bovp\b", it["title"], re.I):
+            warnings.append("sigillo non esplicito nel titolo")
         ship = it.get("ship_eur")
         if ship is None:
             warnings.append("spedizione non verificata")
@@ -115,18 +121,21 @@ def evaluate(items, code, thr, market, cfg):
             warnings.append("venditore non verificato")
 
         total = round(it["item_eur"] + (ship or 0.0) + (it.get("fees_eur") or 0.0), 2)
+        complete_total = ship is not None and it.get("fees_eur") is not None
+        if it.get("fees_eur") is None:
+            warnings.append("commissioni non verificate")
         cls = NO_SOGLIA
-        if thr:
+        if thr and complete_total and "ENG" in checks:
             cls = AFFARE if total <= thr["excellent"] else CONV if total <= thr["max"] else NORMALE
             if cls == AFFARE and warnings:               # un AFFARE richiede tutte le verifiche
                 cls = CONV
         out.append({
             "title": it["title"][:90], "url": it["url"], "source": it["source"], "seller": it.get("seller") or "",
             "reliability": reliability, "item_eur": it["item_eur"], "ship_eur": ship, "fees_eur": it.get("fees_eur") or 0.0,
-            "total_eur": total, "cls": cls, "saving_pct": round((market["value"] - total) / market["value"] * 100, 1),
+            "total_eur": total, "total_complete": complete_total, "price_kind": "asking", "cls": cls, "saving_pct": round((market["value"] - total) / market["value"] * 100, 1),
             "checks": checks, "warnings": warnings, "item_id": it.get("item_id"),
         })
-    out.sort(key=lambda o: o["total_eur"])
+    out.sort(key=lambda o: (not o["total_complete"], o["total_eur"]))
     return out
 
 
@@ -141,10 +150,11 @@ def fmt_offer(o, code, name, market):
     comp += f" + sped. {fmt_eur(o['ship_eur'])}" if o["ship_eur"] is not None else " + sped. n/d"
     if o["fees_eur"]:
         comp += f" + commissioni {fmt_eur(o['fees_eur'])}"
-    lines.append(f"💶 <b>{fmt_eur(o['total_eur'])}</b> totali ({comp})")
+    qualifier = "totali" if o.get("total_complete", False) else "minimo noto; totale da verificare"
+    lines.append(f"💶 <b>{fmt_eur(o['total_eur'])}</b> {qualifier} ({comp}) · prezzo richiesto")
     sav = o["saving_pct"]
-    sav_txt = f"risparmio {fmt_pct(sav)}" if sav >= 0 else f"{fmt_pct(-sav)} sopra il mercato"
-    lines.append(f"📊 Mercato {fmt_eur(market['value'], 0)} ({market_label(market)}) → {sav_txt}")
+    sav_txt = f"{fmt_pct(sav)} sotto il riferimento" if sav >= 0 else f"{fmt_pct(-sav)} sopra il riferimento"
+    lines.append(f"📊 Riferimento {fmt_eur(market['value'], 0)} ({market_label(market)}) → {sav_txt}")
     who = source_label(o) + (f" – {esc(o['seller'])}" if o["source"] in ("ebay", "vinted") and o["seller"] else "")
     lines.append(f"🏪 {esc(who)} · affidabilità: {esc(o['reliability'])}")
     if o["checks"]:
