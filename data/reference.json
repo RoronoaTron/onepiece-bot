@@ -1,0 +1,228 @@
+{
+  "dataset": "one_piece_tcg_english_sealed_booster_boxes_reference",
+  "reference_date": "2026-11-11",
+  "currency": "EUR",
+  "status": "UNVERIFIED_REFERENCE_NOT_LIVE",
+  "description": "Valori ripresi dalle precedenti tabelle della conversazione. Non sono quotazioni live verificate o prezzi medi di venduto. Le soglie di acquisto sono stime indicative.",
+  "notes": [
+    "Prima di segnalare un affare, il bot deve verificare prezzo corrente, lingua EN, sigillo, condizioni, spedizione e reputazione del venditore.",
+    "Non trattare cardmarket_reference_min_eur come prezzo medio di vendita o prezzo disponibile oggi.",
+    "Verificare esistenza, denominazioni e date di pubblicazione dei set prima di attivare il monitoraggio.",
+    "Eventuali dati su eBay sold e Cardmarket trend richiedono rilevazioni datate, non possono essere dedotti dai valori di questa tabella."
+  ],
+  "alert_rules": {
+    "great_deal": "total_cost_eur <= excellent_buy_at_or_below_eur",
+    "good_deal": "excellent_buy_at_or_below_eur < total_cost_eur <= max_recommended_buy_eur",
+    "not_a_deal": "total_cost_eur > max_recommended_buy_eur",
+    "total_cost_eur": "item_price_eur + shipping_eur + mandatory_fees_eur"
+  },
+  "sets": [
+    {
+      "code": "OP01",
+      "name": "Romance Dawn",
+      "language": "EN",
+      "currency": "EUR",
+      "cardmarket_reference_min_eur": 1150,
+      "excellent_buy_at_or_below_eur": 950,
+      "max_recommended_buy_eur": 1050
+    },
+    {
+      "code": "OP02",
+      "name": "Paramount War",
+      "language": "EN",
+      "currency": "EUR",
+      "cardmarket_reference_min_eur": 320,
+      "excellent_buy_at_or_below_eur": 270,
+      "max_recommended_buy_eur": 295
+    },
+    {
+      "code": "OP03",
+      "name": "Pillars of Strength",
+      "language": "EN",
+      "currency": "EUR",
+      "cardmarket_reference_min_eur": 361,
+      "excellent_buy_at_or_below_eur": 300,
+      "max_recommended_buy_eur": 330
+    },
+    {
+      "code": "OP04",
+      "name": "Kingdoms of Intrigue",
+      "language": "EN",
+      "currency": "EUR",
+      "cardmarket_reference_min_eur": 260,
+      "excellent_buy_at_or_below_eur": 220,
+      "max_recommended_buy_eur": 240
+    },
+    {
+      "code": "OP05",
+      "name": "Awakening of the New Era",
+      "language": "EN",
+      "currency": "EUR",
+      "cardmarket_reference_min_eur": 680,
+      "excellent_buy_at_or_below_eur": 570,
+      "max_recommended_buy_eur": 620
+    },
+    {
+      "code": "OP06",
+      "name": "Wings of the Captain",
+      "language": "EN",
+      "currency": "EUR",
+      "cardmarket_reference_min_eur": 250,
+      "excellent_buy_at_or_below_eur": 210,
+      "max_recommended_buy_eur": 230
+    },
+    {
+      "code": "EB01",
+      "name": "Memorial Collection",
+      "language": "EN",
+      "currency": "EUR",
+      "cardmarket_reference_min_eur": 490,
+      "excellent_buy_at_or_below_eur": 410,
+      "max_recommended_buy_eur": 450
+    },
+    {
+      "code": "OP07",
+      "name": "500 Years in the Future",
+      "language": "EN",
+      "currency": "EUR",
+      "cardmarket_reference_min_eur": 213,
+      "excellent_buy_at_or_below_eur": 180,
+      "max_recommended_buy_eur": 195
+    },
+    {
+      "code": "OP08",
+      "name": "Two Legends",
+      "language": "EN",
+      "currency": "EUR",
+      "cardmarket_reference_min_eur": 178,
+      "excellent_buy_at_or_below_eur": 150,
+      "max_recommended_buy_eur": 165
+    },
+    {
+      "code": "PRB01",
+      "name": "The Best",
+      "language": "EN",
+      "currency": "EUR",
+      "cardmarket_reference_min_eur": 320,
+      "excellent_buy_at_or_below_eur": 270,
+      "max_recommended_buy_eur": 295
+    },
+    {
+      "code": "OP09",
+      "name": "Emperors in the New World",
+      "language": "EN",
+      "currency": "EUR",
+      "cardmarket_reference_min_eur": 339,
+      "excellent_buy_at_or_below_eur": 285,
+      "max_recommended_buy_eur": 310
+    },
+    {
+      "code": "OP10",
+      "name": "Royal Blood",
+      "language": "EN",
+      "currency": "EUR",
+      "cardmarket_reference_min_eur": 165,
+      "excellent_buy_at_or_below_eur": 140,
+      "max_recommended_buy_eur": 150
+    },
+    {
+      "code": "EB02",
+      "name": "Anime 25th Collection",
+      "language": "EN",
+      "currency": "EUR",
+      "cardmarket_reference_min_eur": 410,
+      "excellent_buy_at_or_below_eur": 345,
+      "max_recommended_buy_eur": 375
+    },
+    {
+      "code": "OP11",
+      "name": "A Fist of Divine Speed",
+      "language": "EN",
+      "currency": "EUR",
+      "cardmarket_reference_min_eur": 200,
+      "excellent_buy_at_or_below_eur": 170,
+      "max_recommended_buy_eur": 185
+    },
+    {
+      "code": "OP12",
+      "name": "Legacy of the Master",
+      "language": "EN",
+      "currency": "EUR",
+      "cardmarket_reference_min_eur": 194,
+      "excellent_buy_at_or_below_eur": 165,
+      "max_recommended_buy_eur": 180
+    },
+    {
+      "code": "PRB02",
+      "name": "The Best Vol. 2",
+      "language": "EN",
+      "currency": "EUR",
+      "cardmarket_reference_min_eur": 179,
+      "excellent_buy_at_or_below_eur": 150,
+      "max_recommended_buy_eur": 165
+    },
+    {
+      "code": "OP13",
+      "name": "Carrying On His Will",
+      "language": "EN",
+      "currency": "EUR",
+      "cardmarket_reference_min_eur": 295,
+      "excellent_buy_at_or_below_eur": 250,
+      "max_recommended_buy_eur": 270
+    },
+    {
+      "code": "OP14",
+      "name": "The Azure Seas Seven",
+      "language": "EN",
+      "currency": "EUR",
+      "cardmarket_reference_min_eur": 155,
+      "excellent_buy_at_or_below_eur": 130,
+      "max_recommended_buy_eur": 140
+    },
+    {
+      "code": "EB03",
+      "name": "Heroines Edition",
+      "language": "EN",
+      "currency": "EUR",
+      "cardmarket_reference_min_eur": 239,
+      "excellent_buy_at_or_below_eur": 200,
+      "max_recommended_buy_eur": 220
+    },
+    {
+      "code": "OP15",
+      "name": "Adventure on Kami’s Island",
+      "language": "EN",
+      "currency": "EUR",
+      "cardmarket_reference_min_eur": 175,
+      "excellent_buy_at_or_below_eur": 145,
+      "max_recommended_buy_eur": 160
+    },
+    {
+      "code": "OP16",
+      "name": "The Time of Battle",
+      "language": "EN",
+      "currency": "EUR",
+      "cardmarket_reference_min_eur": 155,
+      "excellent_buy_at_or_below_eur": 130,
+      "max_recommended_buy_eur": 140
+    },
+    {
+      "code": "EB05",
+      "name": "Heroines Edition Vol. 2",
+      "language": "EN",
+      "currency": "EUR",
+      "cardmarket_reference_min_eur": 200,
+      "excellent_buy_at_or_below_eur": 170,
+      "max_recommended_buy_eur": 185
+    },
+    {
+      "code": "OP17",
+      "name": "The World’s Strongest Warriors",
+      "language": "EN",
+      "currency": "EUR",
+      "cardmarket_reference_min_eur": 220,
+      "excellent_buy_at_or_below_eur": 185,
+      "max_recommended_buy_eur": 200
+    }
+  ]
+}
